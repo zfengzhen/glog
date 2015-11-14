@@ -967,8 +967,11 @@ void LogFileObject::Write(bool force_flush,
     return;
   }
 
+  struct ::tm tm_time;
+  localtime_r(&timestamp, &tm_time);
+
   if (static_cast<int>(file_length_ >> 20) >= MaxLogSize() ||
-      PidHasChanged()) {
+      PidHasChanged() || DayHasChanged(tm_time)) {
     if (file_ != NULL) fclose(file_);
     file_ = NULL;
     file_length_ = bytes_since_flush_ = 0;
@@ -982,9 +985,6 @@ void LogFileObject::Write(bool force_flush,
     // file.  If that happens, we'll lose lots of log messages, of course!
     if (++rollover_attempt_ != kRolloverAttemptFrequency) return;
     rollover_attempt_ = 0;
-
-    struct ::tm tm_time;
-    localtime_r(&timestamp, &tm_time);
 
     // The logfile's filename will have the date/time & pid in it
     ostringstream time_pid_stream;

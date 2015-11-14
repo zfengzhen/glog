@@ -235,6 +235,15 @@ bool PidHasChanged() {
   return true;
 }
 
+static int32 g_main_day = 0;
+bool DayHasChanged(const struct tm &tm_time) {
+  if (tm_time.tm_mday != g_main_day) {
+    g_main_day = tm_time.tm_mday;
+    return true;
+  }
+  return false;
+}
+
 pid_t GetTID() {
   // On Linux and MacOSX, we try to use gettid().
 #if defined OS_LINUX || defined OS_MACOSX
