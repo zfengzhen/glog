@@ -971,7 +971,7 @@ void LogFileObject::Write(bool force_flush,
   localtime_r(&timestamp, &tm_time);
 
   if (static_cast<int>(file_length_ >> 20) >= MaxLogSize() ||
-      PidHasChanged() || DayHasChanged(tm_time)) {
+      PidHasChanged() || DayHasChanged(tm_time, severity_)) {
     if (file_ != NULL) fclose(file_);
     file_ = NULL;
     file_length_ = bytes_since_flush_ = 0;

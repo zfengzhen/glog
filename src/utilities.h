@@ -160,7 +160,7 @@ WallTime WallTime_Now();
 
 int32 GetMainThreadPid();
 bool PidHasChanged();
-bool DayHasChanged(const struct tm &tm_time);
+bool DayHasChanged(const struct tm &tm_time, int severity);
 
 pid_t GetTID();
 

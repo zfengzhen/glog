@@ -235,10 +235,12 @@ bool PidHasChanged() {
   return true;
 }
 
-static int32 g_main_day = 0;
-bool DayHasChanged(const struct tm &tm_time) {
-  if (tm_time.tm_mday != g_main_day) {
-    g_main_day = tm_time.tm_mday;
+static int32 g_main_day[NUM_SEVERITIES] = { 0 };
+bool DayHasChanged(const struct tm &tm_time, int severity) {
+  if (severity < 0 || severity >= NUM_SEVERITIES)
+    return false;
+  if (tm_time.tm_mday != g_main_day[severity]) {
+    g_main_day[severity] = tm_time.tm_mday;
     return true;
   }
   return false;
