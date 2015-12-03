@@ -331,6 +331,13 @@ void InitGoogleLoggingUtilities(const char* argv0) {
   CHECK(!IsGoogleLoggingInitialized())
       << "You called InitGoogleLogging() twice!";
   const char* slash = strrchr(argv0, '/');
+  WallTime now = WallTime_Now();
+  time_t timestamp = static_cast<time_t>(now);
+  struct ::tm tm_time;
+  localtime_r(&timestamp, &tm_time);
+  for (int i = 0; i < NUM_SEVERITIES; i++) {
+      g_main_day[i] = tm_time.tm_mday;
+  }
 #ifdef OS_WINDOWS
   if (!slash)  slash = strrchr(argv0, '\\');
 #endif
