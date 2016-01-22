@@ -1520,7 +1520,9 @@ extern GOOGLE_GLOG_DLL_DECL Logger* GetLogger(LogSeverity level);
 // be deleted by the caller.  Thread-safe.
 extern GOOGLE_GLOG_DLL_DECL void SetLogger(LogSeverity level, Logger* logger);
 
+
 }
+
 
 // glibc has traditionally implemented two incompatible versions of
 // strerror_r(). There is a poorly defined convention for picking the
@@ -1602,6 +1604,59 @@ GOOGLE_GLOG_DLL_DECL void InstallFailureSignalHandler();
 GOOGLE_GLOG_DLL_DECL void InstallFailureWriter(
     void (*writer)(const char* data, int size));
 
+// Encapsulates all file-system related state
+class GOOGLE_GLOG_DLL_DECL LogFileObject : public base::Logger {
+public:
+    LogFileObject(LogSeverity severity, const char* base_filename);
+    ~LogFileObject();
+
+    virtual void Write(bool force_flush, // Should we force a flush here?
+        time_t timestamp,  // Timestamp for this entry
+        const char* message,
+        int message_len);
+
+    // Configuration options
+    void SetBasename(const char* basename);
+    void SetExtension(const char* ext);
+    void SetSymlinkBasename(const char* symlink_basename);
+
+    // Normal flushing routine
+    virtual void Flush();
+
+    // It is the actual file length for the system loggers,
+    // i.e., INFO, ERROR, etc.
+    virtual uint32 LogSize() {
+        MutexLock l(&lock_);
+        return file_length_;
+    }
+
+    // Internal flush routine.  Exposed so that FlushLogFilesUnsafe()
+    // can avoid grabbing a lock.  Usually Flush() calls it after
+    // acquiring lock_.
+    void FlushUnlocked();
+
+private:
+    static const uint32 kRolloverAttemptFrequency = 0x20;
+
+    Mutex lock_;
+    bool base_filename_selected_;
+    std::string base_filename_;
+    std::string symlink_basename_;
+    std::string filename_extension_;     // option users can specify (eg to add port#)
+    FILE* file_;
+    LogSeverity severity_;
+    uint32 bytes_since_flush_;
+    uint32 file_length_;
+    unsigned int rollover_attempt_;
+    int64 next_flush_time_;         // cycle count at which to flush log
+
+    // Actually create a logfile using the value of base_filename_ and the
+    // supplied argument time_pid_string
+    // REQUIRES: lock_ is held
+    bool CreateLogfile(const std::string& time_pid_string);
+};
 }
+
+
 
 #endif // _LOGGING_H_

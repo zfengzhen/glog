@@ -1216,3 +1216,10 @@ TEST(UserDefinedClass, logging) {
   // We must be able to compile this.
   CHECK_EQ(u, u);
 }
+
+TEST(CustomTest, haha)
+{
+    google::LogFileObject zfz(google::GLOG_INFO, "zfz");
+    time_t now = time(NULL);
+    zfz.Write(true, now, "hello world", sizeof("hello world"));
+}

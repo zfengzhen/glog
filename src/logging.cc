@@ -390,6 +390,8 @@ static bool SendEmailInternal(const char*dest, const char *subject,
 base::Logger::~Logger() {
 }
 
+/*
+// 暴露到.h文件中给外部使用
 namespace {
 
 // Encapsulates all file-system related state
@@ -445,6 +447,7 @@ class LogFileObject : public base::Logger {
 };
 
 }  // namespace
+*/
 
 class LogDestination {
  public:
@@ -823,7 +826,6 @@ void LogDestination::DeleteLogDestinations() {
   delete sinks_;
 }
 
-namespace {
 
 LogFileObject::LogFileObject(LogSeverity severity,
                              const char* base_filename)
@@ -1122,7 +1124,6 @@ void LogFileObject::Write(bool force_flush,
   }
 }
 
-}  // namespace
 
 
 // Static log data space to avoid alloc failures in a LOG(FATAL)
