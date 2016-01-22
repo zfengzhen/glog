@@ -51,6 +51,7 @@
 # include <unistd.h>
 #endif
 #include <vector>
+#include "base/mutex.h"
 
 // Annoying stuff for windows -- makes sure clients can import these functions
 #ifndef GOOGLE_GLOG_DLL_DECL
